@@ -1,0 +1,209 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8" />
+	<title>MDIA 2294</title>
+
+	<style>
+		img {
+			margin: 5px;
+		}
+
+		img.clickable {
+			cursor: pointer;
+		}
+
+		#thumbnail-area {
+			display: flex;
+			justify-content: center;
+			gap: 10px;
+		}
+
+		.nav-button {
+			width: 30px;
+			height: 30px;
+			cursor: pointer;
+			margin: 5px;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>MDIA 2294: Assignment 2</h1>
+
+	<div style="text-align: center">
+		<table>
+			<tr>
+				<td></td>
+				<td style="text-align: center">
+					<div><img id="main-image" alt="Main Image" /></div>
+
+					<!-- you may or may not use this hidden textbox -->
+					<div><input id="current-index" /></div>
+				</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>
+					<img src="images/first.png" id="first-btn" class="nav-button" />
+					<img src="images/prev.png" id="prev-btn" class="nav-button" />
+				</td>
+				<td>
+					<div id="thumbnail-area"></div>
+				</td>
+				<td>
+					<img src="images/next.png" id="next-btn" class="nav-button" />
+					<img src="images/last.png" id="last-btn" class="nav-button" />
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<script>
+		/*
+				Name: Negin Asem Kaffash
+				Student No: A01354548
+				Assignment: Assignment 2 
+			*/
+
+		// Global array storing the image names (without file extensions)
+		const imageList = ["coffee1", "coffee2", "coffee3", "coffee4", "coffee5"];
+		// Variable to track the current image index
+		let currentIndex = 0;
+
+		// Function to initialize the slideshow on page load
+		const first_load = () => {
+			set_main_image(0); // Set the first image as the main image
+			set_thumbnails(); // Display the thumbnails for all images
+
+			// Adding event listeners to navigation buttons
+			//event listener to 'first' button to display the first image
+			document
+				.getElementById("first-btn")
+				.addEventListener("click", set_nav_first);
+			//event listener to 'last' button to display the last image
+			document
+				.getElementById("last-btn")
+				.addEventListener("click", set_nav_last);
+			//event listener to 'next' button to display the next image
+			document
+				.getElementById("next-btn")
+				.addEventListener("click", set_nav_next);
+			//event listener to 'prev' button to display the previous image
+			document
+				.getElementById("prev-btn")
+				.addEventListener("click", set_nav_prev);
+		};
+
+		// Function to set the main image based on the provided index
+		const set_main_image = (index) => {
+			// Generate a random color for the border each time the image is set (I've learned from animation class)
+			const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+			// Select the main image element in the DOM
+			let mainImage = document.querySelector("#main-image");
+			// Set the main image source using the image name from imageList and adding ".jpg" extension
+			mainImage.src = "./images/list/" + imageList[index] + ".jpg";
+
+			// Apply styles to the main image
+			mainImage.style.width = "400px"; // Set image width to 400px
+			mainImage.style.height = "300px"; // Set image height to 300px
+			mainImage.style.borderRadius = "10px"; // Apply a border radius of 10px
+			mainImage.style.border = `4px solid #${randomColor}`; // Apply a 4px border with a random color (from animation class)
+
+			// Update the hidden input with the current index for reference
+			document.querySelector("#current-index").value = index;
+			// Update the global currentIndex variable to the new index
+			currentIndex = index;
+			// Call update_thumbnails to highlight the active thumbnail based on the current index
+			update_thumbnails(index);
+		};
+
+		// Function to generate and display thumbnails in the thumbnail area
+		const set_thumbnails = () => {
+			// Select the thumbnail area in the DOM
+			const thumbnailArea = document.querySelector("#thumbnail-area");
+			// Clear any existing thumbnails to avoid duplication
+			thumbnailArea.innerHTML = "";
+
+			// Loop through imageList to create a thumbnail for each image
+			imageList.forEach((image, index) => {
+				// Create a new img element for each thumbnail
+				const newThumb = document.createElement("img");
+
+				// Set the source of the thumbnail using the image name with "_thumb.jpg" suffix
+				newThumb.src = "./images/list/" + image + "_thumb.jpg";
+				// Add "clickable" class for cursor styling
+				newThumb.className = "clickable";
+				newThumb.style.cursor = "pointer";
+				// Apply width and height styles to the thumbnail
+				newThumb.style.width = "100px";
+				newThumb.style.height = "80px";
+				newThumb.style.borderRadius = "10px";
+
+				// Attach an event listener to each thumbnail to change the main image when clicked
+				newThumb.addEventListener("click", () => {
+					// Call set_main_image with the thumbnail's index
+					set_main_image(index);
+				});
+				// Append the thumbnail image to the thumbnail area in the DOM
+				thumbnailArea.append(newThumb);
+			});
+		};
+
+		// Function to update the appearance of thumbnails based on the current main image index
+		const update_thumbnails = (current_index) => {
+			// Select all thumbnail images within the thumbnail area
+			const thumbnails = document.querySelectorAll("#thumbnail-area img");
+			// Loop through each thumbnail to adjust its styling based on current index
+			thumbnails.forEach((thumbnail, index) => {
+				// For the active thumbnail, set opacity to 1, add red border, and add 'active-thumb' class
+				if (index == current_index) {
+					thumbnail.style.opacity = "1";
+					thumbnail.style.border = "2px solid red";
+					thumbnail.classList.add("active-thumb");
+				} else {
+					// For inactive thumbnails, remove border, set opacity to 0.5, and remove 'active-thumb' class
+					thumbnail.style.border = "none";
+					thumbnail.style.opacity = "0.5";
+					thumbnail.classList.remove("active-thumb");
+				}
+			});
+		};
+
+		// Function to navigate to the first image
+		const set_nav_first = () => {
+			// Call set_main_image with index 0 to display the first image
+			set_main_image(0);
+		};
+
+		// Function to navigate to the last image
+		const set_nav_last = () => {
+			// Call set_main_image with the last index
+			set_main_image(imageList.length - 1);
+		};
+
+		// Function to navigate to the next image, looping back to the start if needed
+		const set_nav_next = () => {
+			//Calculate the next index, resetting to 0 if the current index is the last in the array
+			const nextIndex =
+				currentIndex == imageList.length - 1 ? 0 : currentIndex + 1;
+			// Update main image to the next index
+			set_main_image(nextIndex);
+		};
+
+		// Function to navigate to the previous image, looping to the end if needed
+		const set_nav_prev = () => {
+			// Calculate the previous index, resetting to the last index if at the start
+			const prevIndex =
+				currentIndex == 0 ? imageList.length - 1 : currentIndex - 1;
+			// Update main image to the previous index
+			set_main_image(prevIndex);
+		};
+
+		// Event listener to initialize the slideshow when the page finishes loading
+		window.addEventListener("load", first_load);
+	</script>
+</body>
+
+</html>
